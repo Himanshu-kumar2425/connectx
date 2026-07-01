@@ -1,3 +1,7 @@
+// Polyfill for Node.js 18 — MongoDB driver needs globalThis.crypto (Web Crypto API)
+const { webcrypto } = require('crypto');
+globalThis.crypto = webcrypto;
+
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');

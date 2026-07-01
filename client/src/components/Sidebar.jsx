@@ -86,6 +86,10 @@ const Sidebar = () => {
               const otherUser = chat.users.find((u) => u._id !== authUser._id);
               const isOnline = otherUser ? onlineUsers.includes(otherUser._id) : false;
 
+              const isUnread = chat.latestMessage && 
+                !chat.latestMessage.readBy.includes(authUser._id) && 
+                chat.latestMessage.sender !== authUser._id;
+
               return (
                 <div
                   key={chat._id}
@@ -93,23 +97,28 @@ const Sidebar = () => {
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors mb-1 ${selectedChat?._id === chat._id ? 'bg-brand-primary/10 border border-brand-primary/20' : 'hover:bg-dark-bg'}`}
                 >
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary font-bold">
-                      {chat.isGroupChat ? <Users size={16} /> : otherUser?.username.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary font-bold overflow-hidden">
+                      {chat.isGroupChat ? <Users size={16} /> : (otherUser?.profilePic ? <img src={otherUser.profilePic} className="w-full h-full object-cover" /> : otherUser?.username.charAt(0).toUpperCase())}
                     </div>
                     {!chat.isGroupChat && isOnline && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-dark-panel rounded-full"></span>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate text-dark-text">
-                      {chat.isGroupChat ? chat.chatName : otherUser?.username}
-                    </p>
-                    {chat.latestMessage && (
-                      <p className="text-xs text-dark-muted truncate">
-                        {chat.latestMessage.content === "This message was deleted" 
-                          ? "🚫 This message was deleted" 
-                          : "Encrypted Message 🔒"}
+                  <div className="flex-1 min-w-0 flex justify-between items-center">
+                    <div className="min-w-0 flex-1">
+                      <p className={`font-medium text-sm truncate ${isUnread ? 'text-white font-bold' : 'text-dark-text'}`}>
+                        {chat.isGroupChat ? chat.chatName : otherUser?.username}
                       </p>
+                      {chat.latestMessage && (
+                        <p className={`text-xs truncate ${isUnread ? 'text-brand-primary font-semibold' : 'text-dark-muted'}`}>
+                          {chat.latestMessage.content === "This message was deleted" 
+                            ? "🚫 This message was deleted" 
+                            : "Encrypted Message 🔒"}
+                        </p>
+                      )}
+                    </div>
+                    {isUnread && (
+                      <div className="w-2.5 h-2.5 bg-brand-primary rounded-full shrink-0 ml-2 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
                     )}
                   </div>
                 </div>

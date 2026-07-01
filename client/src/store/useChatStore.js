@@ -55,5 +55,29 @@ export const useChatStore = create((set, get) => ({
     } catch (error) {
       console.log('Error accessing chat', error);
     }
+  },
+
+  deleteMessage: async (messageId) => {
+    try {
+      await axios.delete(`/message/${messageId}`);
+      set((state) => ({
+        messages: state.messages.map((m) =>
+          m._id === messageId ? { ...m, isDeleted: true, content: 'This message was deleted', nonce: 'deleted' } : m
+        )
+      }));
+    } catch (error) {
+      console.log('Error deleting message', error);
+    }
+  },
+
+  reactToMessage: async (messageId, emoji) => {
+    try {
+      const res = await axios.post(`/message/${messageId}/react`, { emoji });
+      set((state) => ({
+        messages: state.messages.map((m) => (m._id === messageId ? res.data : m))
+      }));
+    } catch (error) {
+      console.log('Error reacting', error);
+    }
   }
 }));
